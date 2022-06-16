@@ -85,6 +85,22 @@ app.get('/getEvent/:eventId', jwtMiddleware, (req, res) => {
   });
 });
 
+// saveUpdatedEvent
+app.put('/updateReminder', jwtMiddleware, (req, res) => {
+  dataService
+    .saveUpdatedEvent(
+      req,
+      req.body.id,
+      req.body.eventName,
+      req.body.eventOccurTime,
+      req.body.eventDesc
+    )
+    .then((result) => {
+      console.log(result);
+      res.status(result.statusCode).json(result);
+    });
+});
+
 // assigning port number
 app.listen(3000, () => {
   console.log('Reminder app server started at 3000');

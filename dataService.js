@@ -54,8 +54,8 @@ const login = (userid, pswd) => {
       };
     } else {
       return {
-        statusCode: 200,
-        status: true,
+        statusCode: 401,
+        status: false,
         message: 'login failed. Invalid credentials!!',
       };
     }
@@ -85,6 +85,51 @@ const saveNewEvent = (userid, eventName, eventOccurTime, eventDesc) => {
         status: false,
         message: 'Incorrect account credentials!',
       };
+    }
+  });
+};
+
+// saveUpdatedEvent
+const saveUpdatedEvent = (req, id, eventName, eventOccurTime, eventDesc) => {
+  // let response = {};
+  return db.User.findOne({ userid: req.tokenUserId }).then((user) => {
+    let result = [];
+    if (user) {
+      result = user.reminderevent.map((reminderObj) => {
+        if (reminderObj.id == id) {
+          reminderObj.eventName = eventName;
+          reminderObj.reminderTime = eventOccurTime;
+          reminderObj.description = eventDesc;
+          // console.log(reminderObj);
+        }
+        return reminderObj;
+      });
+    }
+    console.log(user._id);
+    try {
+      return db.User.updateOne(
+        { _id: user._id },
+        { $set: { reminderevent: result } }
+      ).then((succ, err) => {
+        if (err) {
+          return {
+            statusCode: 401,
+            status: False,
+            message: 'Operation failed!!',
+          };
+        } else {
+          return {
+            statusCode: 200,
+            status: true,
+            message: 'Event Updated!!',
+          };
+        }
+
+        // console.log(response);
+        // return response;
+      });
+    } catch (err) {
+      console.log(err);
     }
   });
 };
@@ -167,4 +212,5 @@ module.exports = {
   viewEvent,
   deleteEvent,
   getEventDetails,
+  saveUpdatedEvent,
 };
